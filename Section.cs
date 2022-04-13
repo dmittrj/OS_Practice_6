@@ -38,5 +38,10 @@ namespace OS_Practice_6
         {
             Tasks.Add(task);
         }
+
+        public void UnloadTask(int task)
+        {
+            Tasks.RemoveAt(task);
+        }
     }
 }

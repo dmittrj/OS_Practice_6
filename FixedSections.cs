@@ -51,5 +51,10 @@ namespace OS_Practice_6
                 Sections[max_number].AddTask(file);
             }
         }
+    
+        public void UnloadProgram(int section, int task)
+        {
+            Sections[section].UnloadTask(task);
+        }
     }
 }
