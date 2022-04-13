@@ -4,7 +4,7 @@ namespace OS_Practice_6
 {
     class Program
     {
-        public static void OS_SelectType()
+        public static int OS_SelectType()
         {
             Console.WriteLine(" Выберите алгоритм управления памятью:");
             Console.WriteLine("  1. Распределение памяти фиксированными разделами");
@@ -16,6 +16,17 @@ namespace OS_Practice_6
             Console.WriteLine("  7. Странично-сегметное распределение памяти");
             Console.WriteLine("  8. Свопинг");
             Console.Write(" >");
+            int c;
+        _OS_TypeSelection:
+            try
+            {
+                c = int.Parse(Console.ReadLine());
+            }
+            catch
+            {
+                goto _OS_TypeSelection;
+            }
+            return c;
         }
         static void Main(string[] args)
         {
