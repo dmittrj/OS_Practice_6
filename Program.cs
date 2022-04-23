@@ -4,7 +4,8 @@ namespace OS_Practice_6
 {
     enum MemoryType { 
         FixedSections = 1,
-        RoamingSections = 2
+        RoamingSections = 2,
+        VariableSections = 3
     }
     class Program
     {
@@ -36,6 +37,9 @@ namespace OS_Practice_6
                     _ = new FixedSections(c);
                     break;
                 case MemoryType.RoamingSections:
+                    break;
+                case MemoryType.VariableSections:
+                    _ = new VariableSections();
                     break;
                 default:
                     break;
