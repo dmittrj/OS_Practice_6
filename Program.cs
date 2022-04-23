@@ -33,7 +33,7 @@ namespace OS_Practice_6
                     Console.WriteLine(" На сколько разделов вы хотите разделить оперативную память?");
                     Console.Write(" > ");
                     int c = OS_Inputing.OS_Int(1, OS_Inputing.Infinity);
-                    FixedSections sys = new(c);
+                    _ = new FixedSections(c);
                     break;
                 case MemoryType.RoamingSections:
                     break;
