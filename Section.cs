@@ -43,7 +43,7 @@ namespace OS_Practice_6
         private int Number { get; set; }
         public List<OS_Task> Tasks { get; set; }
 
-        private List<Tuple<int, int>> GetGaps()
+        public List<Tuple<int, int>> GetGaps()
         {
             int occupied = 0;
             List<Tuple<int, int>> emprySectors = new();
