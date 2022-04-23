@@ -108,5 +108,13 @@ namespace OS_Practice_6
             Tasks[task].Identificator = ' ';
             System.IO.File.WriteAllText($"Раздел {Number}.txt", textfromfile);
         }
+
+        public void UnloadAndShiftTask(int task)
+        {
+            string textfromfile = System.IO.File.ReadAllText($"Раздел {Number}.txt");
+            textfromfile = textfromfile.Replace($"Задача {Tasks[task].Identificator}\n", " ");
+            Tasks.RemoveAt(task);
+            System.IO.File.WriteAllText($"Раздел {Number}.txt", textfromfile);
+        }
     }
 }
