@@ -6,7 +6,9 @@ namespace OS_Practice_6
     enum MemoryType { 
         FixedSections = 1,
         RoamingSections = 2,
-        VariableSections = 3
+        VariableSections = 3,
+        PageMemory = 4,
+        PageMemoryLite = 5
     }
     class Program
     {
@@ -49,13 +51,19 @@ namespace OS_Practice_6
                     break;
                 case MemoryType.RoamingSections:
                     Console.Clear();
-                    Console.WriteLine(" 2. Распределение памяти перемещаемыми разделами\n");
-                    Console.WriteLine(" На сколько разделов вы хотите разделить оперативную память?");
-                    Console.Write(" > ");
                     _ = new RoamingSections();
                     break;
                 case MemoryType.VariableSections:
+                    Console.Clear();
                     _ = new VariableSections();
+                    break;
+                case MemoryType.PageMemory:
+                    Console.Clear();
+                    _ = new PageMemory(false);
+                    break;
+                case MemoryType.PageMemoryLite:
+                    Console.Clear();
+                    _ = new PageMemory(true);
                     break;
                 default:
                     break;
