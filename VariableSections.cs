@@ -8,54 +8,71 @@ namespace OS_Practice_6
 {
     class VariableSections
     {
-        public List<Section> Sections { get; set; }
-        public Queue<int> Logs { get; set; }
         private char ID { get; set; }
+        private List<OS_Address> AdrTable { get; set; }
+
+        string OZU;
         public VariableSections()
         {
-            int size = 64 * 1024;
-            Sections = new List<Section>();
-            Logs = new();
+            //int size = 64 * 1024 / count;
+            AdrTable = new();
             ID = 'A';
-            try
-            {
-                Sections.Add(new Section(size, 0));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
             while (true)
             {
                 DrawAkula();
             }
+        }
 
+        private string PeekAddress(float adr)
+        {
+            foreach (OS_Address item in AdrTable)
+            {
+                if (item.Address <= adr &&
+                    item.Address + item.Task.Size >= adr)
+                {
+                    return item.Task.Identificator.ToString();
+                }
+            }
+            return " ";
+        }
+
+        private bool FreeAddress(float adrStart, float adrFinish)
+        {
+            foreach (OS_Address item in AdrTable)
+            {
+                if (item.Address < adrFinish &&
+                    item.Address + item.Task.Size > adrStart)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private void ComposeOZU()
+        {
+            OZU = "";
+            for (int j = 0; j < 65536; j++)
+            {
+                OZU += PeekAddress(j);
+            }
+            System.IO.File.WriteAllText("ОЗУ", OZU);
         }
 
         private void DrawAkula()
         {
             Console.Clear();
-            Console.WriteLine("┌─ Разделы переменной величины ────────────────────────────────┐");
-            for (int i = 0; i < Sections.Count; i++)
+            Console.WriteLine("┌─ Разделы переменной величины ──────────────────────┐");
+            for (int i = 0; i < 10; i++)
             {
-                Console.Write("│ Раздел " + i.ToString());
-                Console.Write(": ");
-                int counter = 0;
-                for (int j = 0; j < Sections[i].Tasks.Count; j++)
+                Console.Write("│ ");
+                for (int j = 0; j < 50; j++)
                 {
-                    for (int k = 0; k < 50 * Sections[i].Tasks[j].Size / Sections[i].Size; k++)
-                    {
-                        Console.Write(Sections[i].Tasks[j].Identificator.ToString());
-                        counter++;
-                    }
+                    Console.Write(PeekAddress((j + 50 * i) * 131.072f));
                 }
-                for (; counter < 50; counter++)
-                {
-                    Console.Write(" ");
-                }
-                Console.WriteLine(" [" + (Sections[i].Size - Sections[i].Free).ToString() + "/" + Sections[i].Size.ToString() + "]");
+                Console.WriteLine(" │");
             }
-            Console.WriteLine("└──────────────────────────────────────────────────────────────┘");
+            Console.WriteLine("└────────────────────────────────────────────────────┘");
             Console.WriteLine(" A - добавить задачу   D - удалить задачу");
             switch (Console.ReadKey().Key)
             {
@@ -91,47 +108,30 @@ namespace OS_Practice_6
 
         public void AddTask(int task_size)
         {
-            if (task_size > Sections[0].Size)
+            for (int i = 0; i < 65536 - task_size; i++)
             {
-                throw new Exception("Размер задачи слишком велик");
-            }
-            int max = Sections[0].Free;
-            int max_number = 0;
-            for (int i = 0; i < Sections.Count; i++)
-            {
-                if (max < Sections[i].Free)
+                if (FreeAddress(i, i + task_size))
                 {
-                    max = Sections[i].Free;
-                    max_number = i;
+                    AdrTable.Add(new OS_Address(new OS_Task(ID++, task_size), i));
+                    ComposeOZU();
+                    return;
                 }
             }
-            if (max < task_size)
-            {
-                throw new Exception("Размер задачи слишком велик");
-            }
-            else
-            {
-                Sections[max_number].AddTask(ID++, task_size);
-            }
+            throw new Exception("Недостаточно свободного места");
         }
 
         public void UnloadTask(char id)
         {
-            foreach (Section section in Sections)
+            foreach (OS_Address section in AdrTable)
             {
-                int counter = 0;
-                foreach (OS_Task task in section.Tasks)
+                if (section.Task.Identificator == id)
                 {
-                    if (task.Identificator == id)
-                    {
-                        section.UnloadTask(counter);
-                        return;
-                    }
-                    counter++;
+                    AdrTable.Remove(section);
+                    ComposeOZU();
+                    return;
                 }
             }
             throw new Exception("Нет задачи с таким ID");
         }
-
     }
 }
