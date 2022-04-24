@@ -52,8 +52,7 @@ namespace OS_Practice_6
                     Console.WriteLine(" 2. Распределение памяти перемещаемыми разделами\n");
                     Console.WriteLine(" На сколько разделов вы хотите разделить оперативную память?");
                     Console.Write(" > ");
-                    int c2 = OS_Inputing.OS_Int(1, OS_Inputing.Infinity);
-                    _ = new RoamingSections(c2);
+                    _ = new RoamingSections();
                     break;
                 case MemoryType.VariableSections:
                     _ = new VariableSections();

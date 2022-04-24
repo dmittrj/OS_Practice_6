@@ -9,13 +9,12 @@ namespace OS_Practice_6
 {
     class FixedSections
     {
-        [Obsolete]
-        public List<int> Sections { get; set; }
-
         public int SectionsCount { get; set; }
         public List<int> SectionsSize { get; set; }
         private char ID { get; set; }
         private List<OS_Address> AdrTable { get; set; }
+
+        string OZU;
         public FixedSections(int count, List<int> sizes)
         {
             //int size = 64 * 1024 / count;
@@ -64,6 +63,16 @@ namespace OS_Practice_6
                 }
             }
             return true;
+        }
+
+        private void ComposeOZU()
+        {
+            OZU = "";
+            for (int j = 0; j < 65536; j++)
+            {
+                OZU += PeekAddress(j);
+            }
+            System.IO.File.WriteAllText("ОЗУ", OZU);
         }
 
         private void DrawAkula()
@@ -137,6 +146,7 @@ namespace OS_Practice_6
                 if (FreeAddress(start_address, start_address + item) && task_size <= item)
                 {
                     AdrTable.Add(new OS_Address(new OS_Task(ID++, task_size), start_address));
+                    ComposeOZU();
                     return;
                 } else
                 {
@@ -153,6 +163,7 @@ namespace OS_Practice_6
                 if (section.Task.Identificator == id)
                 {
                     AdrTable.Remove(section);
+                    ComposeOZU();
                     return;
                 }
             }
