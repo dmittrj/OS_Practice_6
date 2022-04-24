@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OS_Practice_6
 {
-    class OS_Task
+    public class OS_Task
     {
         public char Identificator { get; set; }
         public int Size { get; set; }

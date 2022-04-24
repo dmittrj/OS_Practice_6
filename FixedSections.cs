@@ -9,20 +9,25 @@ namespace OS_Practice_6
 {
     class FixedSections
     {
-        public List<Section> Sections { get; set; }
-        public Queue<int> Logs { get; set; }
+        [Obsolete]
+        public List<int> Sections { get; set; }
+
+        public int SectionsCount { get; set; }
+        public List<int> SectionsSize { get; set; }
         private char ID { get; set; }
-        public FixedSections(int count)
+        private List<OS_Address> AdrTable { get; set; }
+        public FixedSections(int count, List<int> sizes)
         {
-            int size = 64 * 1024 / count;
-            Sections = new List<Section>();
-            Logs = new();
+            //int size = 64 * 1024 / count;
+            SectionsSize = new();
+            AdrTable = new();
             ID = 'A';
             for (int i = 0; i < count; i++)
             {
                 try
                 {
-                    Sections.Add(new Section(size, i));
+                    SectionsSize.Add(sizes[i]);
+
                 } 
                 catch (Exception ex)
                 {
@@ -33,33 +38,64 @@ namespace OS_Practice_6
             {
                 DrawAkula();
             }
-            
+        }
+
+        private string PeekAddress(float adr)
+        {
+            foreach (OS_Address item in AdrTable)
+            {
+                if (item.Address <= adr &&
+                    item.Address + item.Task.Size >= adr)
+                {
+                    return item.Task.Identificator.ToString();
+                }
+            }
+            return " ";
+        }
+
+        private bool FreeAddress(float adrStart, float adrFinish)
+        {
+            foreach (OS_Address item in AdrTable)
+            {
+                if (item.Address < adrFinish &&
+                    item.Address + item.Task.Size > adrStart)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private void DrawAkula()
         {
             Console.Clear();
-            Console.WriteLine("┌─ Фиксированные разделы ──────────────────────────────────────┐");
-            for (int i = 0; i < Sections.Count; i++)
+            Console.WriteLine("┌─ Фиксированные разделы ────────────────────────────┐");
+            for (int i = 0; i < 10; i++)
             {
-                Console.Write("│ Раздел " + i.ToString());
-                Console.Write(": ");
-                int counter = 0;
-                for (int j = 0; j < Sections[i].Tasks.Count; j++)
+                Console.Write("│ ");
+                for (int j = 0; j < 50; j++)
                 {
-                    for (int k = 0; k < 50 * Sections[i].Tasks[j].Size / Sections[i].Size; k++)
-                    {
-                        Console.Write(Sections[i].Tasks[j].Identificator.ToString());
-                        counter++;
-                    }
+                    Console.Write(PeekAddress((j + 50 * i) * 131.072f));
                 }
-                for (; counter < 50; counter++)
-                {
-                    Console.Write(" ");
-                }
-                Console.WriteLine(" [" + (Sections[i].Size - Sections[i].Free).ToString() + "/" + Sections[i].Size.ToString() + "]");
+                Console.WriteLine(" │");
+
+
+                //int counter = 0;
+                //for (int j = 0; j < Sections[i].Tasks.Count; j++)
+                //{
+                //    for (int k = 0; k < 50 * Sections[i].Tasks[j].Size / Sections[i].Size; k++)
+                //    {
+                //        Console.Write(Sections[i].Tasks[j].Identificator.ToString());
+                //        counter++;
+                //    }
+                //}
+                //for (; counter < 50; counter++)
+                //{
+                //    Console.Write(" ");
+                //}
+                //Console.WriteLine(" [" + (Sections[i].Size - Sections[i].Free).ToString() + "/" + Sections[i].Size.ToString() + "]");
             }
-            Console.WriteLine("└──────────────────────────────────────────────────────────────┘");
+            Console.WriteLine("└────────────────────────────────────────────────────┘");
             Console.WriteLine(" A - добавить задачу   D - удалить задачу");
             switch (Console.ReadKey().Key)
             {
@@ -95,42 +131,29 @@ namespace OS_Practice_6
 
         public void AddTask(int task_size)
         {
-            if (task_size > Sections[0].Size)
+            int start_address = 0;
+            foreach (int item in SectionsSize)
             {
-                throw new Exception("Размер задачи слишком велик");
-            }
-            int max = Sections[0].Free;
-            int max_number = 0;
-            for (int i = 0; i < Sections.Count; i++)
-            {
-                if (max < Sections[i].Free)
+                if (FreeAddress(start_address, start_address + item) && task_size <= item)
                 {
-                    max = Sections[i].Free;
-                    max_number = i;
+                    AdrTable.Add(new OS_Address(new OS_Task(ID++, task_size), start_address));
+                    return;
+                } else
+                {
+                    start_address += item;
                 }
             }
-            if (max < task_size)
-            {
-                throw new Exception("Размер задачи слишком велик");
-            } else
-            {
-                Sections[max_number].AddTask(ID++, task_size);
-            }
+            throw new Exception("Нет ни одного подходящего раздела");
         }
     
         public void UnloadTask(char id)
         {
-            foreach (Section section in Sections)
+            foreach (OS_Address section in AdrTable)
             {
-                int counter = 0;
-                foreach (OS_Task task in section.Tasks)
+                if (section.Task.Identificator == id)
                 {
-                    if (task.Identificator == id)
-                    {
-                        section.UnloadTask(counter);
-                        return;
-                    }
-                    counter++;
+                    AdrTable.Remove(section);
+                    return;
                 }
             }
             throw new Exception("Нет задачи с таким ID");

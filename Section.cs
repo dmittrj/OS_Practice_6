@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace OS_Practice_6
 {
+    [Obsolete]
     class Section
     {
         /// <summary>
@@ -41,8 +42,9 @@ namespace OS_Practice_6
         }
 
         private int Number { get; set; }
+        [Obsolete]
         public List<OS_Task> Tasks { get; set; }
-
+        public List<OS_Address> AdrTable { get; set; }
         public List<Tuple<int, int>> GetGaps()
         {
             int occupied = 0;
